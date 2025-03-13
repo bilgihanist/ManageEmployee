@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import EmployeeList from "./components/EmployeeList";
 import AddEmployeeModal from "./components/AddEmployeeModal";
@@ -7,27 +7,20 @@ import EditEmployeeModal from "./components/EditEmployeeModal";
 
 function App() {
 
-    const [employees, setEmployees] = useState([
-        {
-            id: 1,
-            name: "Brad Pitt",
-            email: "bradpitt@gmail.com",
-            address: "89 Chiaroscuro Rd, Portland, USA",
-            phone: "(171) 555-2222"
-        },
-        {
-            id: 2,
-            name: "Ahmet Enes Tokmak",
-            email: "aet@gmail.com",
-            address: "Beylikdüzü CehennemTepesi Ankara, USA",
-            phone: "(536) 254-2514 "
-        }
-    ])
+    const [employees, setEmployees] = useState(() => {
+        const savedEmployees = localStorage.getItem("employees");
+        console.log("savedEmployees", savedEmployees);
+        return savedEmployees ? JSON.parse(savedEmployees) : [];
+    });
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [selectedEmployees, setSelectedEmployees] = useState([]); // kullanıcıların seçtiği çalışanları tutacak state
+
+    useEffect(() => {
+        localStorage.setItem("employees", JSON.stringify(employees));
+    }, [employees])
 
     function openAddModal() {
         setIsAddModalOpen(true);
@@ -62,6 +55,7 @@ function App() {
         const confirmed = window.confirm("silmek istediğinize emin misin uşağım?");
         if (confirmed) {
             setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employee.id)) // seçilen çalışanı diğer çaşılanlardan çıkartacağız. böylece çalışanlar array'i güncellenmiş olacak. 
+            setSelectedEmployees([]); // tüm seçilen çalışanları sıfırlıyoruz.
         }
     }
 
