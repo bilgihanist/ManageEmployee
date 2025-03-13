@@ -14,12 +14,20 @@ function App() {
             email: "bradpitt@gmail.com",
             address: "89 Chiaroscuro Rd, Portland, USA",
             phone: "(171) 555-2222"
+        },
+        {
+            id: 2,
+            name: "Ahmet Enes Tokmak",
+            email: "aet@gmail.com",
+            address: "Beylikdüzü CehennemTepesi Ankara, USA",
+            phone: "(536) 254-2514 "
         }
     ])
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [selectedEmployees, setSelectedEmployees] = useState([]); // kullanıcıların seçtiği çalışanları tutacak state
 
     function openAddModal() {
         setIsAddModalOpen(true);
@@ -38,9 +46,9 @@ function App() {
         ])
     }
     function editEmployee(updatedEmployee) {
-        setEmployees(prevEmployees => 
-             prevEmployees.map(emp => 
-                  emp.id === updatedEmployee.id ? updatedEmployee : emp
+        setEmployees(prevEmployees =>
+            prevEmployees.map(emp =>
+                emp.id === updatedEmployee.id ? updatedEmployee : emp
             )
         )
     }
@@ -50,23 +58,50 @@ function App() {
         setSelectedEmployee(employee);
     }
 
+    function deleteClick(employee) {
+        const confirmed = window.confirm("silmek istediğinize emin misin uşağım?");
+        if (confirmed) {
+            setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employee.id)) // seçilen çalışanı diğer çaşılanlardan çıkartacağız. böylece çalışanlar array'i güncellenmiş olacak. 
+        }
+    }
+
+
+    function deleteSelectedEmployees() {
+        const confirmed = window.confirm("la olm bak çoklu seçiyorsun dikkat et");
+        if (confirmed) {
+            setEmployees(prevEmployees => 
+                prevEmployees.filter(emp => !selectedEmployees.includes(emp.id)) // seçilen çalışanlar array'inde olmayanları alıyoruz. böylece seçilen çalışanlar silinmiş oluyor.
+            );
+            setSelectedEmployees([]); // tüm seçilen çalışanları sıfırlıyoruz.
+        }
+    }
+
     return (
         <div className="container">
             <div className="table-wrapper">
-                <Header onOpenAddModal={openAddModal} />
+                <Header
+                    onOpenAddModal={openAddModal}
+                    onDeleteSelected={deleteSelectedEmployees}
+                />
                 {/* <Header onOpenAddModal={() => setIsAddModalOpen(true)}/>   isteğe bağlı inline yazılabilir. */}
-                <EmployeeList employees={employees} onEditClick={editClick} />
+                <EmployeeList
+                    employees={employees}
+                    onEditClick={editClick}
+                    onDeleteClick={deleteClick}
+                    selectedEmployees={selectedEmployees}
+                    setSelectedEmployees = {setSelectedEmployees}
+                />
                 <AddEmployeeModal isOpen={isAddModalOpen} onCloseAddModal={closeAddModal} onAddEmployee={addEmployee} />
                 {/* <AddEmployeeModal isOpen={isAddModalOpen} onCloseAddModal={() => setIsAddModalOpen(false)}/>  isteğe bağlı inline da yazılabilir.*/}
                 <EditEmployeeModal
-                    isOpen={isEditModalOpen} 
-                    employee= {selectedEmployee}
-                    onCloseEditModal={ () => {
+                    isOpen={isEditModalOpen}
+                    employee={selectedEmployee}
+                    onCloseEditModal={() => {
                         setIsEditModalOpen(false);
                         setSelectedEmployee(null);
                     }}
                     onEditEmployee={editEmployee}
-                    />
+                />
             </div>
         </div>
     )

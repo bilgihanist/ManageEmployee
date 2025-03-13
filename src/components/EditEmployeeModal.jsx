@@ -16,7 +16,7 @@ function EditEmployeeModal({ isOpen, employee, onCloseEditModal, onEditEmployee 
     if (employee) {
       setFormaData(employee)
     }
-  }, [employee])
+  }, [employee]) //dependencies array içerisine employee yazıldı. Bu sayede employee değiştiğinde useEffect çalışacak.
 
 
   function handleChange(e) {
