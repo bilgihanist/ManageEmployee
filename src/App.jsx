@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import EmployeeList from "./components/EmployeeList";
-import AddEmployeeModal from "./components/AddEmployeeModal";
-import EditEmployeeModal from "./components/EditEmployeeModal";
+import EmployeeModal from "./components/EmployeeModal";
 
 
 function App() {
@@ -85,16 +84,20 @@ function App() {
                     selectedEmployees={selectedEmployees}
                     setSelectedEmployees = {setSelectedEmployees}
                 />
-                <AddEmployeeModal isOpen={isAddModalOpen} onCloseAddModal={closeAddModal} onAddEmployee={addEmployee} />
-                {/* <AddEmployeeModal isOpen={isAddModalOpen} onCloseAddModal={() => setIsAddModalOpen(false)}/>  isteğe bağlı inline da yazılabilir.*/}
-                <EditEmployeeModal
+                <EmployeeModal 
+                    mode="add"
+                    isOpen={isAddModalOpen}
+                    onClose={closeAddModal}
+                    onSubmit={addEmployee}
+                />
+                <EmployeeModal 
+                    mode="edit"
                     isOpen={isEditModalOpen}
                     employee={selectedEmployee}
-                    onCloseEditModal={() => {
+                    onClose={() => {
                         setIsEditModalOpen(false);
-                        setSelectedEmployee(null);
-                    }}
-                    onEditEmployee={editEmployee}
+                        setSelectedEmployee(null);}}
+                    onSubmit={editEmployee}
                 />
             </div>
         </div>
