@@ -104,6 +104,5 @@ function App() {
     )
 }
 
-//deneme 12
 
 export default App;
