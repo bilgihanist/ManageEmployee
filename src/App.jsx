@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Header from "./components/Header";
 import EmployeeList from "./components/EmployeeList";
 import EmployeeModal from "./components/EmployeeModal";
@@ -9,7 +9,6 @@ function App() {
 
     const [employees, setEmployees] = useState(() => {
         const savedEmployees = localStorage.getItem("employees");
-        console.log("savedEmployees", savedEmployees);
         return savedEmployees ? JSON.parse(savedEmployees) : [];
     });
 
@@ -19,10 +18,34 @@ function App() {
     const [selectedEmployees, setSelectedEmployees] = useState([]); // kullanıcıların seçtiği çalışanları tutacak state
     const [currentPage, setCurrentPage] = useState(1);
     
-    const itemsPerPage = 3;
-    const indexOfLastEmployee = currentPage * itemsPerPage; // 3 * 1 = 3 
-    const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage; // 3 - 3 = 0
-    const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);    // 0, 3 derived state , computed state
+    const itemsPerPage = 2;
+
+    //  const indexOfLastEmployee = currentPage * itemsPerPage; // 3 * 1 = 3 
+    //  const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage; // 3 - 3 = 0
+    //  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);    // 0, 3 derived state , computed state
+
+    // function getCurrentEmployees() {
+    //     const indexOfLastEmployee = currentPage * itemsPerPage; // 3 * 1 = 3 
+    //     const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage; // 3 - 3 = 0
+    //     return employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+    // }
+
+    /* 
+    useMemo GENEL KULLANIMI AŞAĞIDAKİ GİBİDİR.
+            const memoreizedValue = useMemo( () => {
+                // GEREKLİ HESAPLAMALAR
+
+                //RETURN HESAPLAMALARI
+            }, [dependencies]) 
+     */
+
+
+    const currentEmployees = useMemo( () => {
+        console.log("currentEmployees çalıştı");
+        const indexOfLastEmployee = currentPage * itemsPerPage;
+        const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
+        return employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+    },[ employees, currentPage ])
 
     useEffect(() => {
         localStorage.setItem("employees", JSON.stringify(employees));
@@ -76,6 +99,10 @@ function App() {
         }
     }
 
+    function handlePageChange(pageNumber) {
+        setCurrentPage(pageNumber);
+    }
+
     return (
         <div className="container">
             <div className="table-wrapper">
@@ -112,8 +139,8 @@ function App() {
                     <div className="hint-text">Showing <b>{currentEmployees.length}</b> out of <b>{employees.length}</b> entries</div>
                     <Pagination
                         currentPage={currentPage} // şu anki sayfa numarası
-                        totalPage={Math.ceil(employees.length / itemsPerPage)} // toplam çalışanı sayısını itemsPerPage'a bölüp yukarı yuvarlıyoruz.
-                        //onPageChange
+                        totalPages={Math.ceil(employees.length / itemsPerPage)} // toplam çalışanı sayısını itemsPerPage'a bölüp yukarı yuvarlıyoruz.
+                        onPageChange={handlePageChange}
                     />
                 </div>
 
