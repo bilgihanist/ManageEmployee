@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import EmployeeList from "./components/EmployeeList";
 import EmployeeModal from "./components/EmployeeModal";
+import Pagination from "./components/pagination";
 
 
 function App() {
@@ -16,6 +17,12 @@ function App() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [selectedEmployees, setSelectedEmployees] = useState([]); // kullanıcıların seçtiği çalışanları tutacak state
+    const [currentPage, setCurrentPage] = useState(1);
+    
+    const itemsPerPage = 3;
+    const indexOfLastEmployee = currentPage * itemsPerPage; // 3 * 1 = 3 
+    const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage; // 3 - 3 = 0
+    const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);    // 0, 3 derived state , computed state
 
     useEffect(() => {
         localStorage.setItem("employees", JSON.stringify(employees));
@@ -62,7 +69,7 @@ function App() {
     function deleteSelectedEmployees() {
         const confirmed = window.confirm("la olm bak çoklu seçiyorsun dikkat et");
         if (confirmed) {
-            setEmployees(prevEmployees => 
+            setEmployees(prevEmployees =>
                 prevEmployees.filter(emp => !selectedEmployees.includes(emp.id)) // seçilen çalışanlar array'inde olmayanları alıyoruz. böylece seçilen çalışanlar silinmiş oluyor.
             );
             setSelectedEmployees([]); // tüm seçilen çalışanları sıfırlıyoruz.
@@ -78,27 +85,38 @@ function App() {
                 />
                 {/* <Header onOpenAddModal={() => setIsAddModalOpen(true)}/>   isteğe bağlı inline yazılabilir. */}
                 <EmployeeList
-                    employees={employees}
+                    employees={currentEmployees}
                     onEditClick={editClick}
                     onDeleteClick={deleteClick}
                     selectedEmployees={selectedEmployees}
-                    setSelectedEmployees = {setSelectedEmployees}
+                    setSelectedEmployees={setSelectedEmployees}
                 />
-                <EmployeeModal 
+                <EmployeeModal
                     mode="add"
                     isOpen={isAddModalOpen}
                     onClose={closeAddModal}
                     onSubmit={addEmployee}
                 />
-                <EmployeeModal 
+                <EmployeeModal
                     mode="edit"
                     isOpen={isEditModalOpen}
                     employee={selectedEmployee}
                     onClose={() => {
                         setIsEditModalOpen(false);
-                        setSelectedEmployee(null);}}
+                        setSelectedEmployee(null);
+                    }}
                     onSubmit={editEmployee}
                 />
+
+                <div className="clearfix">
+                    <div className="hint-text">Showing <b>{currentEmployees.length}</b> out of <b>{employees.length}</b> entries</div>
+                    <Pagination
+                        currentPage={currentPage} // şu anki sayfa numarası
+                        totalPage={Math.ceil(employees.length / itemsPerPage)} // toplam çalışanı sayısını itemsPerPage'a bölüp yukarı yuvarlıyoruz.
+                        //onPageChange
+                    />
+                </div>
+
             </div>
         </div>
     )
